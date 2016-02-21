@@ -19,3 +19,5 @@ Release/
 ipch/
 *.opensdf
 *.sdf
+
+chip8/resources/

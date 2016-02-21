@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chip8", "chip8\chip8.vcxproj", "{C0C7A3CC-9057-41B4-925F-149C07B496B4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-qt", "test-qt\test-qt.vcxproj", "{1F11238A-EB49-43FC-9174-0323EB66D1BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C0C7A3CC-9057-41B4-925F-149C07B496B4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C0C7A3CC-9057-41B4-925F-149C07B496B4}.Debug|Win32.Build.0 = Debug|Win32
+		{C0C7A3CC-9057-41B4-925F-149C07B496B4}.Release|Win32.ActiveCfg = Release|Win32
+		{C0C7A3CC-9057-41B4-925F-149C07B496B4}.Release|Win32.Build.0 = Release|Win32
+		{1F11238A-EB49-43FC-9174-0323EB66D1BC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1F11238A-EB49-43FC-9174-0323EB66D1BC}.Debug|Win32.Build.0 = Debug|Win32
+		{1F11238A-EB49-43FC-9174-0323EB66D1BC}.Release|Win32.ActiveCfg = Release|Win32
+		{1F11238A-EB49-43FC-9174-0323EB66D1BC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
