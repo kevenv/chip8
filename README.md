@@ -1,2 +1,3 @@
 # chip8
-Chip8 Emulator
+My Chip8 Emulator.
+
