@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "debug.h"
 #include "types.h"
 
 #define RAM_SIZE   4*1024 // 4 KB
@@ -20,7 +21,7 @@ struct chip8_t {
     u8 SP; // stack pointer
     u16 I; // index register
     u8 V[16]; // data registers
-    
+
     u16 stack[STACK_SIZE/sizeof(u16)];
     u8 ram[RAM_SIZE];
 };
