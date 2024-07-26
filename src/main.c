@@ -7,10 +7,30 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h> // bool
 #include <stdio.h> // printf
+#include <stdlib.h> // exit_code
+#include "chip8.h"
+#include "rom.h"
 
 int main(int argc, char* argv[])
 {
-    printf("chip8\n");
+    // parse args
+    if (argc != 2) {
+        fprintf(stderr, "ERROR: usage should be ./chip8 [rom.ch8]\n");
+        return EXIT_FAILURE;
+    }
+    
+    // load ROM
+    rom_t rom;
+    if (!rom_load(&rom, argv[1])) {
+        return EXIT_FAILURE;
+    }
+
+    // init chip8
+    chip8_t chip8;
+    chip8_init(&chip8);
+    chip8_load_rom(&chip8, &rom);
+
+    return 0;
 
     // init SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -43,6 +63,7 @@ int main(int argc, char* argv[])
     }
 
     // cleanup
+    rom_free(&rom);
     SDL_DestroyWindow(window);
     SDL_Quit();
 

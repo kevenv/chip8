@@ -8,7 +8,12 @@ LDFLAGS := -lSDL2
 BUILD_DIR := _build
 
 SRC := \
-	main.c
+	src/main.c \
+	src/app.c \
+	src/chip8.c \
+	src/display.c \
+	src/keypad.c \
+	src/rom.c
 
 all: $(BUILD_DIR) chip8
 
