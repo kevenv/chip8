@@ -10,18 +10,27 @@
 #include <string.h> // memcpy, memset
 #include "rom.h"
 
+#define PC    chip8->PC
+#define SP    chip8->SP
+#define I     chip8->I
+#define V     chip8->V
+#define STACK chip8->stack
+#define RAM   chip8->ram
+
+#define VF    V[0xF] // VF is the FLAG register
+
 void chip8_init(chip8_t* chip8)
 {
-    chip8->PC = 0x0200;
-    chip8->SP = 0x00;
-    chip8->I = 0x0000;
-    memset(chip8->V, 0, 16);
-    memset(chip8->RAM, 0, RAM_SIZE);
+    PC = 0x0200;
+    SP = 0;
+    I = 0x0000;
+    memset(V, 0, 16);
+    memset(RAM, 0, RAM_SIZE);
 }
 
 void chip8_load_rom(chip8_t* chip8, rom_t* rom)
 {
-    memcpy(&chip8->RAM[chip8->PC], rom->bytes, rom->size);
+    memcpy(&RAM[PC], rom->bytes, rom->size);
 }
 
 void chip8_run(chip8_t* chip8)
@@ -31,9 +40,9 @@ void chip8_run(chip8_t* chip8)
         // 2 byte long instruction
 		// big-endian
         u16 op = 
-        ((u16)chip8->RAM[chip8->PC + 0] << 8) |
-        ((u16)chip8->RAM[chip8->PC + 1] << 0);
-        chip8->PC += 2;
+        ((u16)RAM[PC + 0] << 8) |
+        ((u16)RAM[PC + 1] << 0);
+        PC += 2;
 
         // decode
         u8 op1 = (u8)((op >> 12) & 0xF);
@@ -53,104 +62,99 @@ void chip8_run(chip8_t* chip8)
                         break;
                     case 0xEE: // 00EE
                         printf("RET\n");
-                        // pop stack -> PC
-                        chip8->PC = chip8->stack[chip8->SP];
-                        chip8->SP += 2;
+                        PC = STACK[SP--];
                         break;
                 }
                 break;
             case 0x1: // 1NNN
                 printf("JP nnn\n");
-                chip8->PC = nnn;
+                PC = nnn;
                 break;
             case 0x2: // 2NNN
                 printf("CALL nnn\n");
-                // push PC to stack
-                chip8->stack[chip8->SP] = chip8->PC;
-                chip8->SP-=2;
-                // jump NNN
-                chip8->PC = nnn;
+                STACK[SP++] = PC;
+                PC = nnn;
                 break;
             case 0x3: // 3XNN
                 printf("SE Vx, nn\n");
-                if (chip8->V[x] == nn) 
-                    chip8->PC += 2;
+                if (V[x] == nn) 
+                    PC += 2;
                 break;
             case 0x4: // 4XNN
                 printf("SNE Vx, nn\n");
-                if (chip8->V[x] != nn)
-                    chip8->PC += 2;
+                if (V[x] != nn)
+                    PC += 2;
                 break;
             case 0x5: // 5XY0
                 printf("SE Vx, Vy\n");
-                if (chip8->V[x] == chip8->V[y])
-                    chip8->PC += 2;
+                if (V[x] == V[y])
+                    PC += 2;
                 break;
             case 0x6: // 6XNN
                 printf("LD Vx, nn\n");
-                chip8->V[x] = nn;
+                V[x] = nn;
                 break;
             case 0x7: // 7XNN
                 printf("ADD Vx, nn\n");
-                chip8->V[x] += nn;
+                V[x] += nn;
                 break;
             case 0x8:
                 switch (op2 & 0xF) {
                     case 0x0: // 8XY0
                         printf("LD Vx, Vy\n");
-                        chip8->V[x] = chip8->V[y];
+                        V[x] = V[y];
                         break;
                     case 0x1: // 8XY1
                         printf("OR Vx, Vy\n");
-                        chip8->V[x] |= chip8->V[y];
+                        V[x] = V[x] | V[y];
                         break;
                     case 0x2: // 8XY2
                         printf("AND Vx, Vy\n");
-                        chip8->V[x] &= chip8->V[y];
+                        V[x] = V[x] & V[y];
                         break;
                     case 0x3: // 8XY3
                         printf("XOR Vx, Vy\n");
-                        chip8->V[x] ^= chip8->V[y];
+                        V[x] = V[x] ^ V[y];
                         break;
                     case 0x4: // 8XY4
                         printf("ADD Vx, Vy\n");
-                        VF = chip8->V[x] + chip8->V[y] > 0xFF;
-                        chip8->V[x] += chip8->V[y];
+                        VF = V[x] + V[y] > 0xFF;
+                        V[x] = V[x] + V[y];
                         break;
                     case 0x5: // 8XY5
                         printf("SUB Vx, Vy\n");
-                        VF = chip8->V[x] > chip8->V[y];
-                        chip8->V[x] -= chip8->V[y];
+                        VF = V[x] > V[y];
+                        V[x] = V[x] - V[y];
                         break;
                     case 0x6: // 8XY6
                         printf("SHR Vx\n");
-                        VF = chip8->V[x] & 0x1;
-                        chip8->V[x] = chip8->V[x] >> 1;
+                        VF = V[x] & 0x1;
+                        V[x] = V[x] >> 1;
                         break;
                     case 0x7: // 8XY7
                         printf("SUBN Vx, Vy\n");
-                        VF = chip8->V[y] > chip8->V[x];
-                        chip8->V[x] = chip8->V[y] - chip8->V[x];
+                        VF = V[y] > V[x];
+                        V[x] = V[y] - V[x];
                         break;
                     case 0xE: // 8XYE
                         printf("SHL Vx\n");
-                        VF = (chip8->V[x] & 0b10000000) != 0;
-                        chip8->V[x] = chip8->V[x] << 1;
+                        VF = (V[x] & 0b10000000) != 0;
+                        V[x] = V[x] << 1;
                         break;
                 }
                 break;
             case 0x9: // 9XY0
                 printf("SNE Vx, Vy\n");
-                if (chip8->V[x] != chip8->V[y])
-                    chip8->PC += 2;
+                if (V[x] != V[y])
+                    PC += 2;
                 break;
             case 0xA: // ANNN
                 printf("LD I, nnn\n");
-                chip8->I = nnn;
+                I = nnn;
                 break;
             case 0xB: // BNNN
                 printf("JP V0, nnn\n");
-                chip8->PC = nnn + chip8->V[0];
+                PC = nnn + V[0];
                 break;
             case 0xC:
                 // TODO:
@@ -182,7 +186,7 @@ void chip8_run(chip8_t* chip8)
                         break;
                     case 0x1E: // FX1E
                         printf("ADD I, Vx");
-                        chip8->I = chip8->I + chip8->V[x];
+                        I = I + V[x];
                         break;
                     case 0x29:
                         // TODO:
@@ -193,13 +197,13 @@ void chip8_run(chip8_t* chip8)
                     case 0x55: // FX55
                         printf("LD [I], Vx\n");
                         for (u32 i = 0; i < x; i++) {
-                            chip8->RAM[chip8->I + i] = chip8->V[i]; 
+                            RAM[I + i] = V[i]; 
                         }
                         break;
                     case 0x65: // FX65
                         printf("LD Vx, [I]\n");
                         for (u32 i = 0; i < x; i++) {
-                            chip8->V[i] = chip8->RAM[chip8->I + i];
+                            V[i] = RAM[I + i];
                         }
                         break;
                 }
