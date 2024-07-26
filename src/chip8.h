@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "debug.h"
 #include "types.h"
 
 #define RAM_SIZE   4*1024 // 4 KB

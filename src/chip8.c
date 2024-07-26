@@ -8,6 +8,7 @@
 
 #include <stdio.h> // printf
 #include <string.h> // memcpy, memset
+#include "debug.h"
 #include "rom.h"
 
 #define PC    chip8->PC
@@ -46,7 +47,7 @@ void chip8_run(chip8_t* chip8)
         u8 x = (u8)((op >> 8) & 0xF);
         u8 y = (u8)((op >> 4) & 0xF);
         u8 nn = (u8)(op & 0x00FF);
-        u16 nnn = (u8)(op & 0x0FFF);
+        u16 nnn = (u16)(op & 0x0FFF);
         printf("%X\n", op);
         dump_instruction(op);
 
@@ -70,16 +71,13 @@ void chip8_run(chip8_t* chip8)
                 PC = nnn;
                 break;
             case 0x3: // 3XNN
-                if (V[x] == nn) 
-                    PC += 2;
+                PC = (V[x] == nn) ? PC+2 : PC;
                 break;
             case 0x4: // 4XNN
-                if (V[x] != nn)
-                    PC += 2;
+                PC = (V[x] != nn) ? PC+2 : PC;
                 break;
             case 0x5: // 5XY0
-                if (V[x] == V[y])
-                    PC += 2;
+                PC = (V[x] == V[y]) ? PC+2 : PC;
                 break;
             case 0x6: // 6XNN
                 V[x] = nn;
@@ -124,8 +122,7 @@ void chip8_run(chip8_t* chip8)
                 }
                 break;
             case 0x9: // 9XY0
-                if (V[x] != V[y])
-                    PC += 2;
+                PC = (V[x] != V[y]) ? PC+2 : PC;
                 break;
             case 0xA: // ANNN
                 I = nnn;
@@ -171,12 +168,12 @@ void chip8_run(chip8_t* chip8)
                         // TODO:
                         break;
                     case 0x55: // FX55
-                        for (u32 i = 0; i < x; i++) {
+                        for (u8 i = 0; i < x; i++) {
                             RAM[I + i] = V[i]; 
                         }
                         break;
                     case 0x65: // FX65
-                        for (u32 i = 0; i < x; i++) {
+                        for (u8 i = 0; i < x; i++) {
                             V[i] = RAM[I + i];
                         }
                         break;
