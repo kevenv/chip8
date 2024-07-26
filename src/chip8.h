@@ -9,13 +9,12 @@
 #include "types.h"
 
 #define RAM_SIZE 4*1024
+#define STACK_SIZE 12
 
 // VF is the FLAG register
-#define VF (chip8->V[0x0F])
+#define VF chip8->V[0x0F]
 
 typedef struct rom_t rom_t;
-
-// stack 48 bytes but rounded up to 64 bytes
 
 typedef struct chip8_t chip8_t;
 struct chip8_t {
@@ -24,6 +23,9 @@ struct chip8_t {
     u8 SP; // stack pointer
     u16 I; // index register
     u8 V[16]; // data registers
+
+    // Stack
+    u16 stack[STACK_SIZE]; // only for subroutine return address
     
     // RAM
     u8 RAM[RAM_SIZE];

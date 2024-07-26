@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     chip8_t chip8;
     chip8_init(&chip8);
     chip8_load_rom(&chip8, &rom);
-
+    chip8_run(&chip8);
     return 0;
 
     // init SDL
