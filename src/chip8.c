@@ -9,6 +9,7 @@
 #include <stdio.h> // printf
 #include <string.h> // memcpy, memset
 #include "debug.h"
+#include "keypad.h"
 #include "rom.h"
 
 #define PC    chip8->PC
@@ -20,7 +21,7 @@
 
 #define VF    V[0xF] // VF is the FLAG register
 
-void chip8_init(chip8_t* chip8)
+void chip8_reset(chip8_t* chip8)
 {
     PC = 0x0200;
     SP = 0;
@@ -34,9 +35,9 @@ void chip8_load_rom(chip8_t* chip8, rom_t* rom)
     memcpy(&RAM[PC], rom->bytes, rom->size);
 }
 
-void chip8_run(chip8_t* chip8)
+void chip8_tick(chip8_t* chip8)
 {
-    while (1) {
+    
         // fetch
         u16 op = ((u16)RAM[PC + 0] << 8) | ((u16)RAM[PC + 1] << 0);
         PC += 2;
@@ -48,8 +49,8 @@ void chip8_run(chip8_t* chip8)
         u8 y = (u8)((op >> 4) & 0xF);
         u8 nn = (u8)(op & 0x00FF);
         u16 nnn = (u16)(op & 0x0FFF);
-        printf("%X\n", op);
-        dump_instruction(op);
+        // printf("%X\n", op);
+        // dump_instruction(op);
 
         // execute
         switch (op1) {
@@ -138,9 +139,12 @@ void chip8_run(chip8_t* chip8)
                 break;
             case 0xE:
                 switch (op2) {
-                    case 0x9E:
+                    case 0x9E: // EX9E
+                        //PC = (chip8->keypad.keys[V[x]]) ? PC+2 : PC;
+                        PC = keypad_pressed(chip8->keypad, V[x]) ? PC+2 : PC;
                         break;
-                    case 0xA1:
+                    case 0xA1: // EXA1
+                        PC = !keypad_pressed(chip8->keypad, V[x]) ? PC+2 : PC;
                         break;
                 }
                 break;
@@ -149,8 +153,15 @@ void chip8_run(chip8_t* chip8)
                     case 0x07:
                         // TODO:
                         break;
-                    case 0x0A:
-                        // TODO:
+                    case 0x0A: // FX0A
+                        u8 key;
+                        if (keypad_any_pressed(chip8->keypad, &key)) {
+                            V[x] = key;
+                            PC = PC+2; // skip next instruction
+                        }
+                        else {
+                            PC = PC-2; // wait until pressed
+                        }
                         break;
                     case 0x15:
                         // TODO:
@@ -180,5 +191,5 @@ void chip8_run(chip8_t* chip8)
                 }
                 break;
         }
-    }
+    
 }

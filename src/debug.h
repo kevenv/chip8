@@ -48,14 +48,14 @@ static void dump_instruction(u16 instruction)
         case 0xD: break;
         case 0xE:
             switch (op2) {
-                case 0x9E: break;
-                case 0xA1: break;
+                case 0x9E: printf("SKP Vx\n"); break; // EX9E
+                case 0xA1: printf("SKNP Vx\n"); break; // EXA1
             }
             break;
         case 0xF:
             switch (op2) {
                 case 0x07: break;
-                case 0x0A: break;
+                case 0x0A: printf("LD Vx, K\n"); break; // FX0A
                 case 0x15: break;
                 case 0x18: break;
                 case 0x1E: printf("ADD I, Vx\n"); break; // FX1E
