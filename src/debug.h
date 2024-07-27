@@ -59,7 +59,7 @@ static void dump_instruction(u16 instruction)
                 case 0x15: break;
                 case 0x18: break;
                 case 0x1E: printf("ADD I, Vx\n"); break; // FX1E
-                case 0x29: break;
+                case 0x29: printf("LD F, Vx\n"); break; // FX29
                 case 0x33: break;
                 case 0x55: printf("LD [I], Vx\n"); break; // FX55
                 case 0x65: printf("LD Vx, [I]\n"); break; // FX65

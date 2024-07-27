@@ -9,6 +9,7 @@
 #include <stdio.h> // printf
 #include <string.h> // memcpy, memset
 #include "debug.h"
+#include "display.h"
 #include "keypad.h"
 #include "rom.h"
 
@@ -26,12 +27,13 @@ void chip8_reset(chip8_t* chip8)
     PC = 0x0200;
     SP = 0;
     I = 0x0000;
-    memset(V, 0, 16);
+    memset(V, 0, N_REGS);
     memset(RAM, 0, RAM_SIZE);
 }
 
 void chip8_load_rom(chip8_t* chip8, rom_t* rom)
 {
+    memcpy(&RAM[0x0000], chip8->display->font_rom, FONT_ROM_SIZE);
     memcpy(&RAM[PC], rom->bytes, rom->size);
 }
 
@@ -172,8 +174,8 @@ void chip8_tick(chip8_t* chip8)
                     case 0x1E: // FX1E
                         I = I + V[x];
                         break;
-                    case 0x29:
-                        // TODO:
+                    case 0x29: // FX29
+                        I = 0x0000 + V[x] * FONT_HEIGHT; // address of font sprite V[x]
                         break;
                     case 0x33:
                         // TODO:

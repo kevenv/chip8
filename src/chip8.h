@@ -8,9 +8,11 @@
 
 #include "types.h"
 
+#define N_REGS     16
 #define RAM_SIZE   4*1024 // 4 KB
 #define STACK_SIZE 16*2 // 32 B
 
+typedef struct display_t display_t;
 typedef struct keypad_t keypad_t;
 typedef struct rom_t rom_t;
 
@@ -20,11 +22,12 @@ struct chip8_t {
     u16 PC; // program counter
     u8 SP; // stack pointer
     u16 I; // index register
-    u8 V[16]; // data registers
+    u8 V[N_REGS]; // data registers
 
     u16 stack[STACK_SIZE/sizeof(u16)];
     u8 ram[RAM_SIZE];
 
+    display_t* display;
     keypad_t* keypad;
 };
 

@@ -9,6 +9,7 @@
 #include <stdio.h> // printf
 #include <stdlib.h> // exit_code
 #include "chip8.h"
+#include "display.h"
 #include "keypad.h"
 #include "rom.h"
 
@@ -28,8 +29,11 @@ int main(int argc, char* argv[])
 
     // init chip8
     chip8_t chip8;
+    display_t display;
     keypad_t keypad;
+    chip8.display = &display;
     chip8.keypad = &keypad;
+    display_reset(&display);
     keypad_reset(&keypad);
     chip8_reset(&chip8);
     chip8_load_rom(&chip8, &rom);
