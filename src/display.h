@@ -18,6 +18,7 @@
 #define DISPLAY_W 64
 #define DISPLAY_H 32
 #define VRAM_SIZE (DISPLAY_W * DISPLAY_H)
+#define SPRITE_W 8
 
 typedef struct display_t display_t;
 struct display_t {
@@ -35,10 +36,11 @@ void display_clear(display_t* display);
     5 bytes per sprite (8x5x1 = 40 / 8)
 */
 
+#define N_FONT        16
 #define FONT_WIDTH    8
 #define FONT_HEIGHT   5
-#define N_FONT        16
-#define FONT_ROM_SIZE (N_FONT * FONT_HEIGHT)
+#define FONT_SIZE     ((FONT_WIDTH * FONT_HEIGHT) / 8)
+#define FONT_ROM_SIZE (N_FONT * FONT_SIZE)
 
 static const u8 font[FONT_ROM_SIZE] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0

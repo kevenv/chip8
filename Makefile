@@ -6,6 +6,7 @@ CFLAGS := \
 	-O0 -g
 LDFLAGS := -lSDL2
 BUILD_DIR := _build
+EXE := chip8
 
 SRC := \
 	src/main.c \
@@ -15,10 +16,10 @@ SRC := \
 	src/keypad.c \
 	src/rom.c
 
-all: $(BUILD_DIR) chip8
+all: $(BUILD_DIR) $(EXE)
 
-chip8: $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(SRC) -o $(BUILD_DIR)/chip8
+$(EXE): $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(SRC) -o $(BUILD_DIR)/$(EXE)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

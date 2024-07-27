@@ -48,6 +48,7 @@ bool chip8_tick(chip8_t* chip8)
     u8 op2 = (u8)(op & 0x00FF);
     u8 x = (u8)((op >> 8) & 0xF);
     u8 y = (u8)((op >> 4) & 0xF);
+    u8 n = (u8)(op & 0x000F);
     u8 nn = (u8)(op & 0x00FF);
     u16 nnn = (u16)(op & 0x0FFF);
     printf("%X\n", op);
@@ -138,7 +139,15 @@ bool chip8_tick(chip8_t* chip8)
             // TODO:
             break;
         case 0xD:
-            
+            u32 w = SPRITE_W;
+            u32 h = n; // n = sprite size = w*h/8 (1 bpp)
+            for (u32 j = 0; j < h; j++) {
+                u8 row = RAM[I + j];
+                for (u32 i = 0; i < w; i++) {
+                    u8 px = (row >> (w-1 - i)) & 0x1;
+                    chip8->display->vram[(x + i) + (y + j)*DISPLAY_W] = px;
+                }
+            }
             break;
         case 0xE:
             switch (op2) {
@@ -176,20 +185,16 @@ bool chip8_tick(chip8_t* chip8)
                     I = I + V[x];
                     break;
                 case 0x29: // FX29
-                    I = 0x0000 + V[x] * FONT_HEIGHT; // address of font sprite V[x]
+                    I = 0x0000 + V[x] * FONT_SIZE; // address of font sprite V[x]
                     break;
                 case 0x33:
                     // TODO:
                     break;
                 case 0x55: // FX55
-                    for (u8 i = 0; i < x; i++) {
-                        RAM[I + i] = V[i]; 
-                    }
+                    memcpy(&RAM[I], V, x+1);
                     break;
                 case 0x65: // FX65
-                    for (u8 i = 0; i < x; i++) {
-                        V[i] = RAM[I + i];
-                    }
+                    memcpy(V, &RAM[I], x+1);
                     break;
             }
             break;
