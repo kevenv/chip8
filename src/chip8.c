@@ -59,7 +59,7 @@ void chip8_tick(chip8_t* chip8)
             case 0:
                 switch(op2) {
                     case 0xE0: // 00E0
-                        // TODO:
+                        display_clear(chip8->display);
                         break;
                     case 0xEE: // 00EE
                         PC = STACK[SP--];

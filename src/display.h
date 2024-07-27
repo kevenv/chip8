@@ -8,13 +8,39 @@
 
 #include "types.h"
 
+/*
+    Display
+
+    64 x 32
+    1 bpp (monochrome)
+*/
+
+#define DISPLAY_W 64
+#define DISPLAY_H 32
+#define VRAM_SIZE (DISPLAY_W * DISPLAY_H)
+
+typedef struct display_t display_t;
+struct display_t {
+    u8 vram[VRAM_SIZE];
+    const u8* font_rom;
+};
+
+void display_reset(display_t* display);
+void display_clear(display_t* display);
+
+/*
+    Font
+    
+    8x5 sprite (1 bpp)
+    5 bytes per sprite (8x5x1 = 40 / 8)
+*/
+
 #define FONT_WIDTH    8
 #define FONT_HEIGHT   5
 #define N_FONT        16
-#define FONT_ROM_SIZE N_FONT * FONT_HEIGHT
+#define FONT_ROM_SIZE (N_FONT * FONT_HEIGHT)
 
-// Font glyphs are 8x5 sprite (1 bpp)
-static const u8 font[] = {
+static const u8 font[FONT_ROM_SIZE] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
 	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -32,10 +58,3 @@ static const u8 font[] = {
 	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
-
-typedef struct display_t display_t;
-struct display_t {
-    const u8* font_rom;
-};
-
-void display_reset(display_t* display);

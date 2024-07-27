@@ -5,13 +5,17 @@
  */
 
 #include <SDL2/SDL.h>
-#include <stdbool.h> // bool
 #include <stdio.h> // printf
 #include <stdlib.h> // exit_code
 #include "chip8.h"
 #include "display.h"
 #include "keypad.h"
 #include "rom.h"
+#include "types.h"
+
+#define WINDOW_SCALE 8
+#define WINDOW_W (DISPLAY_W * WINDOW_SCALE)
+#define WINDOW_H (DISPLAY_H * WINDOW_SCALE)
 
 int main(int argc, char* argv[])
 {
@@ -45,7 +49,7 @@ int main(int argc, char* argv[])
     }
     SDL_Window* window = SDL_CreateWindow("Chip8",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        800, 600,
+        WINDOW_W, WINDOW_H,
         SDL_WINDOW_SHOWN
     );
     if (!window) {
@@ -88,7 +92,18 @@ int main(int argc, char* argv[])
         chip8_tick(&chip8);
         
         // render
-        SDL_FillRect(window_surface, NULL, SDL_MapRGBA(window_surface->format, 0, 0, 0, 255));
+        SDL_LockSurface(window_surface);
+        for (u32 i = 0; i < WINDOW_W * WINDOW_H; i++) {
+            u32 x = (i % WINDOW_W) / WINDOW_SCALE;
+            u32 y = (i / WINDOW_W) / WINDOW_SCALE;
+            u8 px = display.vram[x + y * DISPLAY_W] ? 128 : 0;
+            u8* pixels = window_surface->pixels;
+            pixels[i*4 + 0] = px;
+            pixels[i*4 + 1] = px;
+            pixels[i*4 + 2] = px;
+            pixels[i*4 + 3] = px;
+        }
+        SDL_UnlockSurface(window_surface);
 
         SDL_UpdateWindowSurface(window);
         SDL_Delay(10);

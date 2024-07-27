@@ -9,8 +9,8 @@
 #include "types.h"
 
 #define N_REGS     16
-#define RAM_SIZE   4*1024 // 4 KB
-#define STACK_SIZE 16*2 // 32 B
+#define RAM_SIZE   4096 // 4 KB
+#define STACK_SIZE 32 // 32 B
 
 typedef struct display_t display_t;
 typedef struct keypad_t keypad_t;
