@@ -24,9 +24,15 @@ struct chip8_t {
     u16 I; // index register
     u8 V[N_REGS]; // data registers
 
+    // memory
     u16 stack[STACK_SIZE/sizeof(u16)];
     u8 ram[RAM_SIZE];
 
+    // timers
+    u8 DT; // delay timer
+    u8 ST; // sound timer
+
+    // devices
     display_t* display;
     keypad_t* keypad;
 };

@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
         SDL_UnlockSurface(window_surface);
 
         SDL_UpdateWindowSurface(window);
-        SDL_Delay(10);
+        SDL_Delay((u32)(1.0f/60*1000));
     }
 
     // cleanup

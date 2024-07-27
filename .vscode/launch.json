@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/_build/chip8",
-            "args": ["roms/test-char.ch8"],
+            "args": ["roms/pong.ch8"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],

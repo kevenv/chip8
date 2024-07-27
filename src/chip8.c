@@ -7,7 +7,9 @@
 #include "chip8.h"
 
 #include <stdio.h> // printf
+#include <stdlib.h> // rand
 #include <string.h> // memcpy, memset
+#include <time.h> // time
 #include "debug.h"
 #include "display.h"
 #include "keypad.h"
@@ -19,6 +21,8 @@
 #define V     chip8->V
 #define STACK chip8->stack
 #define RAM   chip8->ram
+#define DT    chip8->DT
+#define ST    chip8->ST
 
 #define VF    V[0xF] // VF is the FLAG register
 
@@ -28,7 +32,12 @@ void chip8_reset(chip8_t* chip8)
     SP = 0;
     I = 0x0000;
     memset(V, 0, N_REGS);
+    memset(STACK, 0, STACK_SIZE);
     memset(RAM, 0, RAM_SIZE);
+    ST = 0;
+    DT = 0;
+    //srand(time(NULL));
+    srand(123456789); // TODO:
 }
 
 void chip8_load_rom(chip8_t* chip8, rom_t* rom)
@@ -62,7 +71,7 @@ bool chip8_tick(chip8_t* chip8)
                     display_clear(chip8->display);
                     break;
                 case 0xEE: // 00EE
-                    PC = STACK[SP--];
+                    PC = STACK[--SP];
                     break;
                 default:
                     return false;
@@ -88,7 +97,7 @@ bool chip8_tick(chip8_t* chip8)
             V[x] = nn;
             break;
         case 0x7: // 7XNN
-            V[x] += nn;
+            V[x] = V[x] + nn;
             break;
         case 0x8:
             switch (op2 & 0xF) {
@@ -135,17 +144,26 @@ bool chip8_tick(chip8_t* chip8)
         case 0xB: // BNNN
             PC = nnn + V[0];
             break;
-        case 0xC:
-            // TODO:
+        case 0xC: // CXNN
+            u8 rnd = (u8)(rand() % 256);
+            V[x] = rnd & nn;
             break;
-        case 0xD:
+        case 0xD: // DXYN
+            // TODO:
+            // n = 5;
+            // I = 0x0000 + 8*FONT_SIZE;
             u32 w = SPRITE_W;
             u32 h = n; // n = sprite size = w*h/8 (1 bpp)
+            VF = 0;
             for (u32 j = 0; j < h; j++) {
                 u8 row = RAM[I + j];
                 for (u32 i = 0; i < w; i++) {
                     u8 px = (row >> (w-1 - i)) & 0x1;
-                    chip8->display->vram[(x + i) + (y + j)*DISPLAY_W] = px;
+                    u8* px_vram = &chip8->display->vram[(x + i) + (y + j)*DISPLAY_W];
+                    if ((px ^ *px_vram) == 0) {
+                        VF = 1; // pixel collision
+                    }
+                    *px_vram = *px_vram ^ px; // XOR draw
                 }
             }
             break;
@@ -162,8 +180,8 @@ bool chip8_tick(chip8_t* chip8)
             break;
         case 0xF:
             switch (op2) {
-                case 0x07:
-                    // TODO:
+                case 0x07: // FX07
+                    V[x] = DT;
                     break;
                 case 0x0A: // FX0A
                     u8 key;
@@ -175,11 +193,12 @@ bool chip8_tick(chip8_t* chip8)
                         PC = PC-2; // wait until pressed
                     }
                     break;
-                case 0x15:
-                    // TODO:
+                case 0x15: // FX15
+                    DT = V[x];
                     break;
-                case 0x18:
-                    // TODO:
+                case 0x18: // FX18
+                    // -
+                    ST = V[x];
                     break;
                 case 0x1E: // FX1E
                     I = I + V[x];
@@ -189,6 +208,7 @@ bool chip8_tick(chip8_t* chip8)
                     break;
                 case 0x33:
                     // TODO:
+                    printf("?\n");
                     break;
                 case 0x55: // FX55
                     memcpy(&RAM[I], V, x+1);
@@ -199,6 +219,10 @@ bool chip8_tick(chip8_t* chip8)
             }
             break;
     }
+
+    // update timers
+    if (DT > 0) DT--;
+    if (DT > 0) ST--;
     
     return true;
 }
