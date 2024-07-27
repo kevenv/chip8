@@ -56,31 +56,30 @@ int main(int argc, char* argv[])
     while (running) {
         // handle events
         while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
-                    running = false;
-                    break;
+            if (event.type == SDL_QUIT) {
+                running = false;
+                break;
             }
         }
 
         // update
         const u8* keys = SDL_GetKeyboardState(NULL);
-        keypad.keys[0] = keys[SDLK_1];
-        keypad.keys[1] = keys[SDLK_2];
-        keypad.keys[2] = keys[SDLK_3];
-        keypad.keys[3] = keys[SDLK_4];
-        keypad.keys[4] = keys[SDLK_q];
-        keypad.keys[5] = keys[SDLK_w];
-        keypad.keys[6] = keys[SDLK_e];
-        keypad.keys[7] = keys[SDLK_r];
-        keypad.keys[8] = keys[SDLK_a];
-        keypad.keys[9] = keys[SDLK_s];
-        keypad.keys[10] = keys[SDLK_d];
-        keypad.keys[11] = keys[SDLK_f];
-        keypad.keys[12] = keys[SDLK_z];
-        keypad.keys[13] = keys[SDLK_x];
-        keypad.keys[14] = keys[SDLK_c];
-        keypad.keys[15] = keys[SDLK_v];
+        keypad.keys[0] = keys[SDL_SCANCODE_1];
+        keypad.keys[1] = keys[SDL_SCANCODE_2];
+        keypad.keys[2] = keys[SDL_SCANCODE_3];
+        keypad.keys[3] = keys[SDL_SCANCODE_4];
+        keypad.keys[4] = keys[SDL_SCANCODE_Q];
+        keypad.keys[5] = keys[SDL_SCANCODE_W];
+        keypad.keys[6] = keys[SDL_SCANCODE_E];
+        keypad.keys[7] = keys[SDL_SCANCODE_R];
+        keypad.keys[8] = keys[SDL_SCANCODE_A];
+        keypad.keys[9] = keys[SDL_SCANCODE_S];
+        keypad.keys[10] = keys[SDL_SCANCODE_D];
+        keypad.keys[11] = keys[SDL_SCANCODE_F];
+        keypad.keys[12] = keys[SDL_SCANCODE_Z];
+        keypad.keys[13] = keys[SDL_SCANCODE_X];
+        keypad.keys[14] = keys[SDL_SCANCODE_C];
+        keypad.keys[15] = keys[SDL_SCANCODE_V];
 
         chip8_tick(&chip8);
         
