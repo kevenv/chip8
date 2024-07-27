@@ -33,4 +33,4 @@ struct chip8_t {
 
 void chip8_reset(chip8_t* chip8);
 void chip8_load_rom(chip8_t* chip8, rom_t* rom);
-void chip8_tick(chip8_t* chip8);
+bool chip8_tick(chip8_t* chip8);

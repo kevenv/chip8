@@ -19,6 +19,7 @@ static void dump_instruction(u16 instruction)
             switch(op2) {
                 case 0xE0: printf("CLS\n"); break; // 00E0
                 case 0xEE: printf("RET\n"); break; // 00EE
+                default: printf("STOP\n"); break;
             }
             break;
         case 0x1: printf("JP nnn\n"); break; // 1NNN

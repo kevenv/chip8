@@ -89,7 +89,9 @@ int main(int argc, char* argv[])
         keypad.keys[14] = keys[SDL_SCANCODE_C];
         keypad.keys[15] = keys[SDL_SCANCODE_V];
 
-        chip8_tick(&chip8);
+        if (!chip8_tick(&chip8)) {
+            running = false;
+        }
         
         // render
         SDL_LockSurface(window_surface);
