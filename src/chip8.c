@@ -149,30 +149,11 @@ bool chip8_tick(chip8_t* chip8)
             V[x] = rnd & nn;
             break;
         case 0xD: // DXYN
-            // TODO:
-            // n = 5;
-            // I = 0x0000 + 8*FONT_SIZE;
-            u32 w = SPRITE_W;
-            u32 h = n; // n = sprite size = w*h/8 (1 bpp)
-            VF = 0;
-            for (u32 j = 0; j < h; j++) {
-                u8 row = RAM[I + j];
-                for (u32 i = 0; i < w; i++) {
-                    u32 ox = V[x];
-                    u32 oy = V[y];
-                    u8 px = (row >> (w-1 - i)) & 0x1;
-                    u8* px_vram = &chip8->display->vram[(ox + i) + (oy + j)*DISPLAY_W];
-                    if (px & *px_vram) {
-                        VF = 1; // pixel collision
-                    }
-                    *px_vram = *px_vram ^ px; // XOR draw
-                }
-            }
+            chip8_dxyn(chip8, V[x], V[y], n);
             break;
         case 0xE:
             switch (op2) {
                 case 0x9E: // EX9E
-                    //PC = (chip8->keypad.keys[V[x]]) ? PC+2 : PC;
                     PC = keypad_pressed(chip8->keypad, V[x]) ? PC+2 : PC;
                     break;
                 case 0xA1: // EXA1
@@ -199,7 +180,6 @@ bool chip8_tick(chip8_t* chip8)
                     DT = V[x];
                     break;
                 case 0x18: // FX18
-                    // -
                     ST = V[x];
                     break;
                 case 0x1E: // FX1E
@@ -227,4 +207,22 @@ bool chip8_tick(chip8_t* chip8)
     if (DT > 0) ST--;
     
     return true;
+}
+
+void chip8_dxyn(chip8_t* chip8, u8 x, u8 y, u8 n)
+{
+    u32 w = SPRITE_W;
+    u32 h = n; // n = sprite size = w*h/8 (1 bpp)
+    VF = 0;
+    for (u32 j = 0; j < h; j++) {
+        u8 row = RAM[I + j];
+        for (u32 i = 0; i < w; i++) {
+            u8 px = (row >> (w-1 - i)) & 0x1;
+            u8* px_vram = &chip8->display->vram[(x + i) + (y + j)*DISPLAY_W];
+            if (px & *px_vram) {
+                VF = 1; // pixel collision
+            }
+            *px_vram = *px_vram ^ px; // XOR draw
+        }
+    }
 }

@@ -28,6 +28,7 @@ struct display_t {
 
 void display_reset(display_t* display);
 void display_clear(display_t* display);
+void display_test(display_t* display);
 
 /*
     Font
