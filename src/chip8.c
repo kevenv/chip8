@@ -158,9 +158,11 @@ bool chip8_tick(chip8_t* chip8)
             for (u32 j = 0; j < h; j++) {
                 u8 row = RAM[I + j];
                 for (u32 i = 0; i < w; i++) {
+                    u32 ox = V[x];
+                    u32 oy = V[y];
                     u8 px = (row >> (w-1 - i)) & 0x1;
-                    u8* px_vram = &chip8->display->vram[(x + i) + (y + j)*DISPLAY_W];
-                    if ((px ^ *px_vram) == 0) {
+                    u8* px_vram = &chip8->display->vram[(ox + i) + (oy + j)*DISPLAY_W];
+                    if (px & *px_vram) {
                         VF = 1; // pixel collision
                     }
                     *px_vram = *px_vram ^ px; // XOR draw

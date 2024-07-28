@@ -89,8 +89,11 @@ int main(int argc, char* argv[])
         keypad.keys[14] = keys[SDL_SCANCODE_C];
         keypad.keys[15] = keys[SDL_SCANCODE_V];
 
-        if (!chip8_tick(&chip8)) {
-            running = false;
+        for (u32 i = 0; i < 8; i++) {
+            if (!chip8_tick(&chip8)) {
+                running = false;
+                break;
+            }
         }
         
         // render
