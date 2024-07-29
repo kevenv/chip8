@@ -8,7 +8,6 @@
 
 #include "types.h"
 
-#define N_REGS     16
 #define RAM_SIZE   4096 // 4 KB
 #define STACK_SIZE 32 // 32 B
 
@@ -25,7 +24,7 @@ struct chip8_t {
     u16 PC; // program counter
     u8 SP; // stack pointer
     u16 I; // index register
-    u8 V[N_REGS]; // data registers
+    u8 V[16]; // data registers
 
     // memory
     u16 stack[STACK_SIZE/sizeof(u16)];

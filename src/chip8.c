@@ -31,7 +31,7 @@ void chip8_reset(chip8_t* chip8)
     PC = 0x0200;
     SP = 0;
     I = 0x0000;
-    memset(V, 0, N_REGS);
+    memset(V, 0, 16*sizeof(u8));
     memset(STACK, 0, STACK_SIZE);
     memset(RAM, 0, RAM_SIZE);
     DT = 0;
@@ -42,7 +42,7 @@ void chip8_reset(chip8_t* chip8)
 
 void chip8_load_rom(chip8_t* chip8, rom_t* rom)
 {
-    memcpy(&RAM[0x0000], chip8->display->font_rom, FONT_ROM_SIZE);
+    memcpy(&RAM[FONT_ADDRESS], chip8->display->font_rom, FONT_ROM_SIZE);
     memcpy(&RAM[PC], rom->bytes, rom->size);
 }
 
@@ -186,7 +186,7 @@ bool chip8_tick(chip8_t* chip8)
                     I = I + V[x];
                     break;
                 case 0x29: // FX29
-                    I = 0x0000 + V[x] * FONT_SIZE; // address of font sprite V[x]
+                    I = FONT_ADDRESS + V[x] * FONT_SIZE; // address of font sprite V[x]
                     break;
                 case 0x33:
                     // TODO:

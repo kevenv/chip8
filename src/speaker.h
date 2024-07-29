@@ -10,7 +10,7 @@
     Speaker
 
     only one tone (1-bit audio)
-	ON when ST > 0
+    ON when ST > 0
 */
 
 // RESET -> START -> PLAYING -> STOP -> RESET

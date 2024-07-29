@@ -37,11 +37,11 @@ void display_test(display_t* display);
     5 bytes per sprite (8x5x1 = 40 / 8)
 */
 
-#define N_FONT        16
 #define FONT_WIDTH    8
 #define FONT_HEIGHT   5
 #define FONT_SIZE     ((FONT_WIDTH * FONT_HEIGHT) / 8)
-#define FONT_ROM_SIZE (N_FONT * FONT_SIZE)
+#define FONT_ROM_SIZE (16 * FONT_SIZE)
+#define FONT_ADDRESS  0x0000
 
 static const u8 font[FONT_ROM_SIZE] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
