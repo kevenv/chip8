@@ -45,3 +45,4 @@ bool chip8_tick(chip8_t* chip8);
 void chip8_timers_tick(chip8_t* chip8);
 
 void chip8_dxyn(chip8_t* chip8, u8 x, u8 y, u8 n);
+void chip8_fx33(chip8_t* chip8, u8 x);

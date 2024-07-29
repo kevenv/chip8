@@ -53,13 +53,13 @@ bool chip8_tick(chip8_t* chip8)
     PC += 2;
 
     // decode
-    u8 op1 = (u8)((op >> 12) & 0xF);
-    u8 op2 = (u8)(op & 0x00FF);
-    u8 x = (u8)((op >> 8) & 0xF);
-    u8 y = (u8)((op >> 4) & 0xF);
-    u8 n = (u8)(op & 0x000F);
-    u8 nn = (u8)(op & 0x00FF);
-    u16 nnn = (u16)(op & 0x0FFF);
+    u8 op1 = (u8)((op >> 12) & 0xF); // opcode part 1
+    u8 op2 = (u8)(op & 0x00FF); // opcode part 2
+    u8 x = (u8)((op >> 8) & 0xF); // V reg index or x coord
+    u8 y = (u8)((op >> 4) & 0xF); // V reg index or y coord
+    u8 n = (u8)(op & 0x000F); // 4-bit immediate
+    u8 nn = (u8)(op & 0x00FF); // 8-bit immediate
+    u16 nnn = (u16)(op & 0x0FFF); // 12-bit address
     // printf("%X\n", op);
     // dump_instruction(op);
     // dump_regs(chip8);
@@ -192,9 +192,8 @@ bool chip8_tick(chip8_t* chip8)
                 case 0x29: // FX29
                     I = FONT_ADDRESS + V[x] * FONT_SIZE; // address of font sprite V[x]
                     break;
-                case 0x33:
-                    // TODO:
-                    // printf("?\n");
+                case 0x33: // FX33
+                    chip8_fx33(chip8, x);
                     break;
                 case 0x55: // FX55
                     memcpy(&RAM[I], V, x+1);
@@ -231,4 +230,15 @@ void chip8_dxyn(chip8_t* chip8, u8 x, u8 y, u8 n)
             *px_vram = *px_vram ^ px; // XOR draw
         }
     }
+}
+
+void chip8_fx33(chip8_t* chip8, u8 x)
+{
+    // convert to BCD (Binary Coded Decimal)
+    u8 n = V[x];
+    RAM[I + 0] = n / 100;
+    n = n % 100;
+    RAM[I + 1] = n / 10;
+    n = n % 10;
+    RAM[I + 2] = n / 1;
 }

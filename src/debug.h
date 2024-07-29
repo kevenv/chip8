@@ -70,7 +70,7 @@ static void dump_instruction(u16 instruction)
                 case 0x18: printf("LD ST, V%hhX\n", x); break; // FX18
                 case 0x1E: printf("ADD I, V%hhX\n", x); break; // FX1E
                 case 0x29: printf("LDF V%hhX\n", x); break; // FX29
-                case 0x33: printf("unimplemented\n"); break;
+                case 0x33: printf("LDB, V%hhX\n", x); break; // FX33
                 case 0x55: printf("LD [I], V%hhX\n", x); break; // FX55
                 case 0x65: printf("LD V%hhX, [I]\n", x); break; // FX65
             }
