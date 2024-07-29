@@ -40,5 +40,6 @@ struct chip8_t {
 void chip8_reset(chip8_t* chip8);
 void chip8_load_rom(chip8_t* chip8, rom_t* rom);
 bool chip8_tick(chip8_t* chip8);
+void chip8_timers_tick(chip8_t* chip8);
 
 void chip8_dxyn(chip8_t* chip8, u8 x, u8 y, u8 n);

@@ -34,8 +34,8 @@ void chip8_reset(chip8_t* chip8)
     memset(V, 0, N_REGS);
     memset(STACK, 0, STACK_SIZE);
     memset(RAM, 0, RAM_SIZE);
-    ST = 0;
     DT = 0;
+    ST = 0;
     //srand(time(NULL));
     srand(123456789); // TODO:
 }
@@ -60,8 +60,8 @@ bool chip8_tick(chip8_t* chip8)
     u8 n = (u8)(op & 0x000F);
     u8 nn = (u8)(op & 0x00FF);
     u16 nnn = (u16)(op & 0x0FFF);
-    printf("%X\n", op);
-    dump_instruction(op);
+    // printf("%X\n", op);
+    // dump_instruction(op);
 
     // execute
     switch (op1) {
@@ -190,7 +190,7 @@ bool chip8_tick(chip8_t* chip8)
                     break;
                 case 0x33:
                     // TODO:
-                    printf("?\n");
+                    // printf("?\n");
                     break;
                 case 0x55: // FX55
                     memcpy(&RAM[I], V, x+1);
@@ -202,11 +202,13 @@ bool chip8_tick(chip8_t* chip8)
             break;
     }
 
-    // update timers
-    if (DT > 0) DT--;
-    if (DT > 0) ST--;
-    
     return true;
+}
+
+void chip8_timers_tick(chip8_t* chip8)
+{
+    if (DT > 0) DT--;
+    if (ST > 0) ST--;
 }
 
 void chip8_dxyn(chip8_t* chip8, u8 x, u8 y, u8 n)

@@ -14,7 +14,8 @@ SRC := \
 	src/chip8.c \
 	src/display.c \
 	src/keypad.c \
-	src/rom.c
+	src/rom.c \
+	src/speaker.c
 
 all: $(BUILD_DIR) $(EXE)
 

@@ -11,6 +11,7 @@
 #include "display.h"
 #include "keypad.h"
 #include "rom.h"
+#include "speaker.h"
 #include "types.h"
 
 #define WINDOW_SCALE 8
@@ -35,10 +36,12 @@ int main(int argc, char* argv[])
     chip8_t chip8;
     display_t display;
     keypad_t keypad;
+    speaker_t speaker;
     chip8.display = &display;
     chip8.keypad = &keypad;
     display_reset(&display);
     keypad_reset(&keypad);
+    speaker_reset(&speaker);
     chip8_reset(&chip8);
     chip8_load_rom(&chip8, &rom);
 
@@ -94,6 +97,19 @@ int main(int argc, char* argv[])
                 running = false;
                 break;
             }
+        }
+
+        chip8_timers_tick(&chip8);
+        speaker_tick(&speaker, chip8.ST);
+        printf("%c", chip8.ST > 0 ? '*' : '-');
+
+        if (speaker.state == SPEAKER_START) {
+            printf("S");
+            speaker.state = SPEAKER_PLAYING;
+        }
+        if (speaker.state == SPEAKER_STOP) {
+            printf("E");
+            speaker.state = SPEAKER_RESET;
         }
         
         // render
