@@ -7,6 +7,9 @@
 #pragma once
 
 #include <stdio.h> // printf
+#include "chip8.h"
+#include "display.h"
+#include "keypad.h"
 #include "types.h"
 
 static void dump_instruction(u16 instruction)
@@ -73,4 +76,52 @@ static void dump_instruction(u16 instruction)
             }
             break;
     }
+}
+
+static void dump_regs(chip8_t* chip8)
+{
+    printf("PC: 0x%04hX SP: %02hu I: 0x%04hX\n", chip8->PC, chip8->SP, chip8->I);
+    for (u32 i = 0; i < 16; i++) {
+        printf(" V%hhX ", i);
+    }
+    printf("\n");
+    for (u32 i = 0; i < 16; i++) {
+        printf("%*hhu ", 3, chip8->V[i]);
+    }
+    printf("\n");
+    printf("DT: %03hu ST: %03hu\n", chip8->DT, chip8->ST);
+}
+
+static void dump_stack(chip8_t* chip8)
+{
+    u32 n = STACK_SIZE / sizeof(u16);
+    printf("stack:\n");
+    for (u32 i = 0; i < n; i++) {
+        printf("  [%02hhu] %04hX %s\n", i, chip8->stack[i], i == chip8->SP ? "<=" : "");
+    }
+}
+
+static void dump_keypad(keypad_t* keypad)
+{
+    char k[N_KEYS];
+    for (u32 i = 0; i < N_KEYS; i++) {
+        k[i] = keypad->keys[i] ? '1' : '0';
+    }
+    printf("keypad:\n");
+    printf("%c %c %c %c  1 2 3 C\n", k[1],  k[2], k[3],  k[12]);
+    printf("%c %c %c %c  4 5 6 D\n", k[4],  k[5], k[6],  k[13]);
+    printf("%c %c %c %c  7 8 9 E\n", k[7],  k[8], k[9],  k[14]);
+    printf("%c %c %c %c  A 0 B F\n", k[10], k[0], k[11], k[15]);
+}
+
+static void dump_display(display_t* display)
+{
+    printf("vram:\n");
+    for (u32 i = 0; i < VRAM_SIZE; i++) {
+        if (i != 0 && (i % DISPLAY_W == 0)) {
+            printf("\n");
+        }
+        printf("%c", display->vram[i] == 1 ? '1' : '0');
+    }
+    printf("\n");
 }

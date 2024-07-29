@@ -92,13 +92,13 @@ int main(int argc, char* argv[])
 
             chip8_timers_tick(&chip8);
             speaker_tick(&speaker, chip8.ST);
-            printf("%c", chip8.ST > 0 ? '*' : '-');
+            // printf("%c", chip8.ST > 0 ? '*' : '-');
             if (speaker.state == SPEAKER_START) {
-                printf("S");
+                // printf("S");
                 speaker.state = SPEAKER_PLAYING;
             }
             if (speaker.state == SPEAKER_STOP) {
-                printf("E");
+                // printf("E");
                 speaker.state = SPEAKER_RESET;
             }
 

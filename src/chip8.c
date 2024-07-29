@@ -62,6 +62,10 @@ bool chip8_tick(chip8_t* chip8)
     u16 nnn = (u16)(op & 0x0FFF);
     // printf("%X\n", op);
     // dump_instruction(op);
+    // dump_regs(chip8);
+    // dump_stack(chip8);
+    // dump_keypad(chip8->keypad);
+    // dump_display(chip8->display);
 
     // execute
     switch (op1) {
