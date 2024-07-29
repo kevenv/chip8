@@ -72,21 +72,21 @@ int main(int argc, char* argv[])
 
         // update
         const u8* keys = SDL_GetKeyboardState(NULL);
-        keypad.keys[0] = keys[SDL_SCANCODE_1];
-        keypad.keys[1] = keys[SDL_SCANCODE_2];
-        keypad.keys[2] = keys[SDL_SCANCODE_3];
-        keypad.keys[3] = keys[SDL_SCANCODE_4];
+        keypad.keys[0] = keys[SDL_SCANCODE_X];
+        keypad.keys[1] = keys[SDL_SCANCODE_1];
+        keypad.keys[2] = keys[SDL_SCANCODE_2];
+        keypad.keys[3] = keys[SDL_SCANCODE_3];
         keypad.keys[4] = keys[SDL_SCANCODE_Q];
         keypad.keys[5] = keys[SDL_SCANCODE_W];
         keypad.keys[6] = keys[SDL_SCANCODE_E];
-        keypad.keys[7] = keys[SDL_SCANCODE_R];
-        keypad.keys[8] = keys[SDL_SCANCODE_A];
-        keypad.keys[9] = keys[SDL_SCANCODE_S];
-        keypad.keys[10] = keys[SDL_SCANCODE_D];
-        keypad.keys[11] = keys[SDL_SCANCODE_F];
-        keypad.keys[12] = keys[SDL_SCANCODE_Z];
-        keypad.keys[13] = keys[SDL_SCANCODE_X];
-        keypad.keys[14] = keys[SDL_SCANCODE_C];
+        keypad.keys[7] = keys[SDL_SCANCODE_A];
+        keypad.keys[8] = keys[SDL_SCANCODE_S];
+        keypad.keys[9] = keys[SDL_SCANCODE_D];
+        keypad.keys[10] = keys[SDL_SCANCODE_Z];
+        keypad.keys[11] = keys[SDL_SCANCODE_C];
+        keypad.keys[12] = keys[SDL_SCANCODE_4];
+        keypad.keys[13] = keys[SDL_SCANCODE_R];
+        keypad.keys[14] = keys[SDL_SCANCODE_F];
         keypad.keys[15] = keys[SDL_SCANCODE_V];
 
         for (u32 i = 0; i < 8; i++) {
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
         for (u32 i = 0; i < WINDOW_W * WINDOW_H; i++) {
             u32 x = (i % WINDOW_W) / WINDOW_SCALE;
             u32 y = (i / WINDOW_W) / WINDOW_SCALE;
-            u8 px = display.vram[x + y * DISPLAY_W] ? 128 : 0;
+            u8 px = display.vram[x + y * DISPLAY_W] ? 255 : 0;
             u8* pixels = window_surface->pixels;
             pixels[i*4 + 0] = px;
             pixels[i*4 + 1] = px;
