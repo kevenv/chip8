@@ -18,6 +18,8 @@
 #define WINDOW_W (DISPLAY_W * WINDOW_SCALE)
 #define WINDOW_H (DISPLAY_H * WINDOW_SCALE)
 
+void update_keypad(keypad_t* keypad);
+
 int main(int argc, char* argv[])
 {
     // parse args
@@ -61,73 +63,63 @@ int main(int argc, char* argv[])
     }
     SDL_Surface* window_surface = SDL_GetWindowSurface(window);
 
-    // main loop
+    // tick emulator
+    u32 cycles = 0;
     bool running = true;
-    SDL_Event event;
     while (running) {
-        // handle events
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-                break;
-            }
-        }
-
-        // update
-        const u8* keys = SDL_GetKeyboardState(NULL);
-        keypad.keys[0] = keys[SDL_SCANCODE_X];
-        keypad.keys[1] = keys[SDL_SCANCODE_1];
-        keypad.keys[2] = keys[SDL_SCANCODE_2];
-        keypad.keys[3] = keys[SDL_SCANCODE_3];
-        keypad.keys[4] = keys[SDL_SCANCODE_Q];
-        keypad.keys[5] = keys[SDL_SCANCODE_W];
-        keypad.keys[6] = keys[SDL_SCANCODE_E];
-        keypad.keys[7] = keys[SDL_SCANCODE_A];
-        keypad.keys[8] = keys[SDL_SCANCODE_S];
-        keypad.keys[9] = keys[SDL_SCANCODE_D];
-        keypad.keys[10] = keys[SDL_SCANCODE_Z];
-        keypad.keys[11] = keys[SDL_SCANCODE_C];
-        keypad.keys[12] = keys[SDL_SCANCODE_4];
-        keypad.keys[13] = keys[SDL_SCANCODE_R];
-        keypad.keys[14] = keys[SDL_SCANCODE_F];
-        keypad.keys[15] = keys[SDL_SCANCODE_V];
-
-        for (u32 i = 0; i < 8; i++) {
-            if (!chip8_tick(&chip8)) {
-                running = false;
-                break;
-            }
-        }
-
-        chip8_timers_tick(&chip8);
-        speaker_tick(&speaker, chip8.ST);
-        printf("%c", chip8.ST > 0 ? '*' : '-');
-
-        if (speaker.state == SPEAKER_START) {
-            printf("S");
-            speaker.state = SPEAKER_PLAYING;
-        }
-        if (speaker.state == SPEAKER_STOP) {
-            printf("E");
-            speaker.state = SPEAKER_RESET;
+        // tick @ 500Hz
+        if (!chip8_tick(&chip8)) {
+            running = false;
+            printf("QUIT\n");
+            break;
         }
         
-        // render
-        SDL_LockSurface(window_surface);
-        for (u32 i = 0; i < WINDOW_W * WINDOW_H; i++) {
-            u32 x = (i % WINDOW_W) / WINDOW_SCALE;
-            u32 y = (i / WINDOW_W) / WINDOW_SCALE;
-            u8 px = display.vram[x + y * DISPLAY_W] ? 255 : 0;
-            u8* pixels = window_surface->pixels;
-            pixels[i*4 + 0] = px;
-            pixels[i*4 + 1] = px;
-            pixels[i*4 + 2] = px;
-            pixels[i*4 + 3] = px;
-        }
-        SDL_UnlockSurface(window_surface);
+        // tick @ 60Hz
+        if (cycles >= CPU_FREQ_HZ / TIMER_FREQ_HZ) {
+            cycles = 0;
 
-        SDL_UpdateWindowSurface(window);
-        SDL_Delay((u32)(1.0f/60*1000));
+            // handle events
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    running = false;
+                    break;
+                }
+            }
+
+            // update
+            update_keypad(&keypad);
+
+            chip8_timers_tick(&chip8);
+            speaker_tick(&speaker, chip8.ST);
+            printf("%c", chip8.ST > 0 ? '*' : '-');
+            if (speaker.state == SPEAKER_START) {
+                printf("S");
+                speaker.state = SPEAKER_PLAYING;
+            }
+            if (speaker.state == SPEAKER_STOP) {
+                printf("E");
+                speaker.state = SPEAKER_RESET;
+            }
+
+            // render
+            SDL_LockSurface(window_surface);
+            for (u32 i = 0; i < WINDOW_W * WINDOW_H; i++) {
+                u32 x = (i % WINDOW_W) / WINDOW_SCALE;
+                u32 y = (i / WINDOW_W) / WINDOW_SCALE;
+                u8 px = display.vram[x + y * DISPLAY_W] ? 255 : 0;
+                u8* pixels = window_surface->pixels;
+                pixels[i*4 + 0] = px;
+                pixels[i*4 + 1] = px;
+                pixels[i*4 + 2] = px;
+                pixels[i*4 + 3] = px;
+            }
+            SDL_UnlockSurface(window_surface);
+            SDL_UpdateWindowSurface(window);
+        }
+
+        SDL_Delay((u32)(1.0f/CPU_FREQ_HZ*1000));
+        cycles++;
     }
 
     // cleanup
@@ -136,4 +128,25 @@ int main(int argc, char* argv[])
     SDL_Quit();
 
     return 0;
+}
+
+void update_keypad(keypad_t* keypad)
+{
+    const u8* keys = SDL_GetKeyboardState(NULL);
+    keypad->keys[0] = keys[SDL_SCANCODE_X];
+    keypad->keys[1] = keys[SDL_SCANCODE_1];
+    keypad->keys[2] = keys[SDL_SCANCODE_2];
+    keypad->keys[3] = keys[SDL_SCANCODE_3];
+    keypad->keys[4] = keys[SDL_SCANCODE_Q];
+    keypad->keys[5] = keys[SDL_SCANCODE_W];
+    keypad->keys[6] = keys[SDL_SCANCODE_E];
+    keypad->keys[7] = keys[SDL_SCANCODE_A];
+    keypad->keys[8] = keys[SDL_SCANCODE_S];
+    keypad->keys[9] = keys[SDL_SCANCODE_D];
+    keypad->keys[10] = keys[SDL_SCANCODE_Z];
+    keypad->keys[11] = keys[SDL_SCANCODE_C];
+    keypad->keys[12] = keys[SDL_SCANCODE_4];
+    keypad->keys[13] = keys[SDL_SCANCODE_R];
+    keypad->keys[14] = keys[SDL_SCANCODE_F];
+    keypad->keys[15] = keys[SDL_SCANCODE_V];
 }

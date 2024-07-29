@@ -12,6 +12,9 @@
 #define RAM_SIZE   4096 // 4 KB
 #define STACK_SIZE 32 // 32 B
 
+#define CPU_FREQ_HZ   500
+#define TIMER_FREQ_HZ 60
+
 typedef struct display_t display_t;
 typedef struct keypad_t keypad_t;
 typedef struct rom_t rom_t;
