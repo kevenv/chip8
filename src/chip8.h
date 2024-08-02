@@ -33,7 +33,7 @@ struct chip8_t {
     u8 V[16]; // data registers
 
     // memory
-    u16 stack[STACK_SIZE/sizeof(u16)];
+    u16 stack[STACK_SIZE / sizeof(u16)];
     u8 ram[RAM_SIZE];
 
     // timers

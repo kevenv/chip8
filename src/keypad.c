@@ -10,7 +10,7 @@
 
 void keypad_reset(keypad_t* keypad)
 {
-    memset(keypad->keys, false, N_KEYS*sizeof(bool));
+    memset(keypad->keys, false, N_KEYS * sizeof(bool));
 }
 
 bool keypad_pressed(keypad_t* keypad, u8 key)

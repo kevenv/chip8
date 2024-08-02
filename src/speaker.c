@@ -16,7 +16,7 @@ void speaker_tick(speaker_t* speaker, u8 ST)
     if (speaker->state == SPEAKER_RESET && ST > 0) {
         speaker->state = SPEAKER_START;
     }
-    else if(speaker->state == SPEAKER_PLAYING && ST == 0) {
+    else if (speaker->state == SPEAKER_PLAYING && ST == 0) {
         speaker->state = SPEAKER_STOP;
     }
 }

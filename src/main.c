@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
     if (!app_init(&app)) {
         return EXIT_FAILURE;
     }
-    
+
     // load ROM
     rom_t rom;
     if (!rom_load(&rom, argv[1])) {
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
             printf("QUIT\n");
             break;
         }
-        
+
         // tick @ 60Hz
         if (cycles >= CPU_FREQ_HZ / TIMER_FREQ_HZ) {
             cycles = 0;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
             app_render(&app, &display);
         }
 
-        app_sleep(&app, (u32)(1.0f/CPU_FREQ_HZ*1000));
+        app_sleep(&app, (u32)(1.0f / CPU_FREQ_HZ * 1000));
         cycles++;
     }
 

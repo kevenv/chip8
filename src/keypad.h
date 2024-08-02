@@ -19,7 +19,7 @@
         7 8 9 E
         A 0 B F
 
-    Arrow keys: 
+    Arrow keys:
           2
         4   6
           8

@@ -16,11 +16,11 @@ bool app_init(app_t* app)
         fprintf(stderr, "ERROR: could not initialize SDL: %s\n", SDL_GetError());
         // goto sdl_init_fail;
     }
-    app->window = SDL_CreateWindow("Chip8",
+    app->window = SDL_CreateWindow(
+        "Chip8",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         WINDOW_W, WINDOW_H,
-        SDL_WINDOW_SHOWN
-    );
+        SDL_WINDOW_SHOWN);
     if (!app->window) {
         fprintf(stderr, "ERROR: could not create SDL window: %s\n", SDL_GetError());
         // goto sdl_window_fail;
@@ -75,10 +75,10 @@ void app_render(app_t* app, display_t* display)
         u32 y = (i / WINDOW_W) / WINDOW_SCALE;
         u8 px = display->vram[x + y * DISPLAY_W] ? 255 : 0;
         u8* pixels = app->window_surface->pixels;
-        pixels[i*4 + 0] = px;
-        pixels[i*4 + 1] = px;
-        pixels[i*4 + 2] = px;
-        pixels[i*4 + 3] = px;
+        pixels[i * 4 + 0] = px;
+        pixels[i * 4 + 1] = px;
+        pixels[i * 4 + 2] = px;
+        pixels[i * 4 + 3] = px;
     }
     SDL_UnlockSurface(app->window_surface);
     SDL_UpdateWindowSurface(app->window);

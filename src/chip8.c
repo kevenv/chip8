@@ -24,19 +24,19 @@
 #define DT    chip8->DT
 #define ST    chip8->ST
 
-#define VF    V[0xF] // VF is the FLAG register
+#define VF V[0xF] // VF is the FLAG register
 
 void chip8_reset(chip8_t* chip8)
 {
     PC = 0x0200;
     SP = 0;
     I = 0x0000;
-    memset(V, 0, 16*sizeof(u8));
+    memset(V, 0, 16 * sizeof(u8));
     memset(STACK, 0, STACK_SIZE);
     memset(RAM, 0, RAM_SIZE);
     DT = 0;
     ST = 0;
-    //srand(time(NULL));
+    // srand(time(NULL));
     srand(123456789); // TODO:
 }
 
@@ -69,153 +69,153 @@ bool chip8_tick(chip8_t* chip8)
 
     // execute
     switch (op1) {
-        case 0x0:
-            switch(op2) {
-                case 0xE0: // 00E0
-                    display_clear(chip8->display);
-                    break;
-                case 0xEE: // 00EE
-                    PC = STACK[--SP];
-                    break;
-                default:
-                    printf("unimplemented! %hX\n", op);
-                    return false;
-            }
+    case 0x0:
+        switch (op2) {
+        case 0xE0: // 00E0
+            display_clear(chip8->display);
             break;
-        case 0x1: // 1NNN
-            PC = nnn;
+        case 0xEE: // 00EE
+            PC = STACK[--SP];
             break;
-        case 0x2: // 2NNN
-            STACK[SP++] = PC;
-            PC = nnn;
+        default:
+            printf("unimplemented! %hX\n", op);
+            return false;
+        }
+        break;
+    case 0x1: // 1NNN
+        PC = nnn;
+        break;
+    case 0x2: // 2NNN
+        STACK[SP++] = PC;
+        PC = nnn;
+        break;
+    case 0x3: // 3XNN
+        PC = (V[x] == nn) ? PC + 2 : PC;
+        break;
+    case 0x4: // 4XNN
+        PC = (V[x] != nn) ? PC + 2 : PC;
+        break;
+    case 0x5: // 5XY0
+        PC = (V[x] == V[y]) ? PC + 2 : PC;
+        break;
+    case 0x6: // 6XNN
+        V[x] = nn;
+        break;
+    case 0x7: // 7XNN
+        V[x] = V[x] + nn;
+        break;
+    case 0x8:
+        switch (op2 & 0xF) {
+        case 0x0: // 8XY0
+            V[x] = V[y];
             break;
-        case 0x3: // 3XNN
-            PC = (V[x] == nn) ? PC+2 : PC;
+        case 0x1: // 8XY1
+            V[x] = V[x] | V[y];
             break;
-        case 0x4: // 4XNN
-            PC = (V[x] != nn) ? PC+2 : PC;
+        case 0x2: // 8XY2
+            V[x] = V[x] & V[y];
             break;
-        case 0x5: // 5XY0
-            PC = (V[x] == V[y]) ? PC+2 : PC;
+        case 0x3: // 8XY3
+            V[x] = V[x] ^ V[y];
             break;
-        case 0x6: // 6XNN
-            V[x] = nn;
+        case 0x4: // 8XY4
+            VF = V[x] + V[y] > 0xFF;
+            V[x] = V[x] + V[y];
             break;
-        case 0x7: // 7XNN
-            V[x] = V[x] + nn;
+        case 0x5: // 8XY5
+            VF = V[x] > V[y];
+            V[x] = V[x] - V[y];
             break;
-        case 0x8:
-            switch (op2 & 0xF) {
-                case 0x0: // 8XY0
-                    V[x] = V[y];
-                    break;
-                case 0x1: // 8XY1
-                    V[x] = V[x] | V[y];
-                    break;
-                case 0x2: // 8XY2
-                    V[x] = V[x] & V[y];
-                    break;
-                case 0x3: // 8XY3
-                    V[x] = V[x] ^ V[y];
-                    break;
-                case 0x4: // 8XY4
-                    VF = V[x] + V[y] > 0xFF;
-                    V[x] = V[x] + V[y];
-                    break;
-                case 0x5: // 8XY5
-                    VF = V[x] > V[y];
-                    V[x] = V[x] - V[y];
-                    break;
-                case 0x6: // 8XY6
-                    VF = V[x] & 0x1;
-                    V[x] = V[x] >> 1;
-                    break;
-                case 0x7: // 8XY7
-                    VF = V[y] > V[x];
-                    V[x] = V[y] - V[x];
-                    break;
-                case 0xE: // 8XYE
-                    VF = (V[x] & 0b10000000) != 0;
-                    V[x] = V[x] << 1;
-                    break;
-                default:
-                    printf("unimplemented! %hX\n", op);
-                    break;
-            }
+        case 0x6: // 8XY6
+            VF = V[x] & 0x1;
+            V[x] = V[x] >> 1;
             break;
-        case 0x9: // 9XY0
-            PC = (V[x] != V[y]) ? PC+2 : PC;
+        case 0x7: // 8XY7
+            VF = V[y] > V[x];
+            V[x] = V[y] - V[x];
             break;
-        case 0xA: // ANNN
-            I = nnn;
-            break;
-        case 0xB: // BNNN
-            PC = nnn + V[0];
-            break;
-        case 0xC: // CXNN
-            u8 rnd = (u8)(rand() % 256);
-            V[x] = rnd & nn;
-            break;
-        case 0xD: // DXYN
-            chip8_dxyn(chip8, V[x], V[y], n);
-            break;
-        case 0xE:
-            switch (op2) {
-                case 0x9E: // EX9E
-                    PC = keypad_pressed(chip8->keypad, V[x]) ? PC+2 : PC;
-                    break;
-                case 0xA1: // EXA1
-                    PC = !keypad_pressed(chip8->keypad, V[x]) ? PC+2 : PC;
-                    break;
-                default:
-                    printf("unimplemented! %hX\n", op);
-                    break;
-            }
-            break;
-        case 0xF:
-            switch (op2) {
-                case 0x07: // FX07
-                    V[x] = DT;
-                    break;
-                case 0x0A: // FX0A
-                    u8 key;
-                    if (keypad_any_pressed(chip8->keypad, &key)) {
-                        V[x] = key;
-                        PC = PC+2; // skip next instruction
-                    }
-                    else {
-                        PC = PC-2; // wait until pressed
-                    }
-                    break;
-                case 0x15: // FX15
-                    DT = V[x];
-                    break;
-                case 0x18: // FX18
-                    ST = V[x];
-                    break;
-                case 0x1E: // FX1E
-                    I = I + V[x];
-                    break;
-                case 0x29: // FX29
-                    I = FONT_ADDRESS + V[x] * FONT_SIZE; // address of font sprite V[x]
-                    break;
-                case 0x33: // FX33
-                    chip8_fx33(chip8, x);
-                    break;
-                case 0x55: // FX55
-                    memcpy(&RAM[I], V, x+1);
-                    break;
-                case 0x65: // FX65
-                    memcpy(V, &RAM[I], x+1);
-                    break;
-                default:
-                    printf("unimplemented! %hX\n", op);
-                    break;
-            }
+        case 0xE: // 8XYE
+            VF = (V[x] & 0b10000000) != 0;
+            V[x] = V[x] << 1;
             break;
         default:
             printf("unimplemented! %hX\n", op);
             break;
+        }
+        break;
+    case 0x9: // 9XY0
+        PC = (V[x] != V[y]) ? PC + 2 : PC;
+        break;
+    case 0xA: // ANNN
+        I = nnn;
+        break;
+    case 0xB: // BNNN
+        PC = nnn + V[0];
+        break;
+    case 0xC: // CXNN
+        u8 rnd = (u8)(rand() % 256);
+        V[x] = rnd & nn;
+        break;
+    case 0xD: // DXYN
+        chip8_dxyn(chip8, V[x], V[y], n);
+        break;
+    case 0xE:
+        switch (op2) {
+        case 0x9E: // EX9E
+            PC = keypad_pressed(chip8->keypad, V[x]) ? PC + 2 : PC;
+            break;
+        case 0xA1: // EXA1
+            PC = !keypad_pressed(chip8->keypad, V[x]) ? PC + 2 : PC;
+            break;
+        default:
+            printf("unimplemented! %hX\n", op);
+            break;
+        }
+        break;
+    case 0xF:
+        switch (op2) {
+        case 0x07: // FX07
+            V[x] = DT;
+            break;
+        case 0x0A: // FX0A
+            u8 key;
+            if (keypad_any_pressed(chip8->keypad, &key)) {
+                V[x] = key;
+                PC = PC + 2; // skip next instruction
+            }
+            else {
+                PC = PC - 2; // wait until pressed
+            }
+            break;
+        case 0x15: // FX15
+            DT = V[x];
+            break;
+        case 0x18: // FX18
+            ST = V[x];
+            break;
+        case 0x1E: // FX1E
+            I = I + V[x];
+            break;
+        case 0x29: // FX29
+            I = FONT_ADDRESS + V[x] * FONT_SIZE; // address of font sprite V[x]
+            break;
+        case 0x33: // FX33
+            chip8_fx33(chip8, x);
+            break;
+        case 0x55: // FX55
+            memcpy(&RAM[I], V, x + 1);
+            break;
+        case 0x65: // FX65
+            memcpy(V, &RAM[I], x + 1);
+            break;
+        default:
+            printf("unimplemented! %hX\n", op);
+            break;
+        }
+        break;
+    default:
+        printf("unimplemented! %hX\n", op);
+        break;
     }
 
     return true;
@@ -235,8 +235,8 @@ void chip8_dxyn(chip8_t* chip8, u8 x, u8 y, u8 n)
     for (u32 j = 0; j < h; j++) {
         u8 row = RAM[I + j];
         for (u32 i = 0; i < w; i++) {
-            u8 px = (row >> (w-1 - i)) & 0x1;
-            u8* px_vram = &chip8->display->vram[(x + i) + (y + j)*DISPLAY_W];
+            u8 px = (row >> (w - 1 - i)) & 0x1;
+            u8* px_vram = &chip8->display->vram[(x + i) + (y + j) * DISPLAY_W];
             if (px & *px_vram) {
                 VF = 1; // pixel collision
             }

@@ -11,14 +11,14 @@
 #include "types.h"
 
 #define WINDOW_SCALE 8
-#define WINDOW_W (DISPLAY_W * WINDOW_SCALE)
-#define WINDOW_H (DISPLAY_H * WINDOW_SCALE)
+#define WINDOW_W     (DISPLAY_W * WINDOW_SCALE)
+#define WINDOW_H     (DISPLAY_H * WINDOW_SCALE)
 
 typedef struct keypad_t keypad_t;
 
 /*
     App
-    
+
     Interface between the Chip8 emulator and the SDL window,
     making the rest of the code independent of SDL.
     The emulator is hooked to the SDL window to implement I/O.
