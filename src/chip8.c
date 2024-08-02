@@ -78,6 +78,7 @@ bool chip8_tick(chip8_t* chip8)
                     PC = STACK[--SP];
                     break;
                 default:
+                    printf("unimplemented! %hX\n", op);
                     return false;
             }
             break;
@@ -137,6 +138,9 @@ bool chip8_tick(chip8_t* chip8)
                     VF = (V[x] & 0b10000000) != 0;
                     V[x] = V[x] << 1;
                     break;
+                default:
+                    printf("unimplemented! %hX\n", op);
+                    break;
             }
             break;
         case 0x9: // 9XY0
@@ -162,6 +166,9 @@ bool chip8_tick(chip8_t* chip8)
                     break;
                 case 0xA1: // EXA1
                     PC = !keypad_pressed(chip8->keypad, V[x]) ? PC+2 : PC;
+                    break;
+                default:
+                    printf("unimplemented! %hX\n", op);
                     break;
             }
             break;
@@ -201,7 +208,13 @@ bool chip8_tick(chip8_t* chip8)
                 case 0x65: // FX65
                     memcpy(V, &RAM[I], x+1);
                     break;
+                default:
+                    printf("unimplemented! %hX\n", op);
+                    break;
             }
+            break;
+        default:
+            printf("unimplemented! %hX\n", op);
             break;
     }
 

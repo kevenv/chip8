@@ -8,6 +8,12 @@
 
 #include "types.h"
 
+/*
+    ROM
+
+    Binary dump of a user program.
+*/
+
 typedef struct rom_t rom_t;
 struct rom_t {
     u8* bytes;

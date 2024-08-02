@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: MIT License
  */
 
-#include <SDL2/SDL.h>
 #include <stdio.h> // printf
 #include <stdlib.h> // exit_code
+#include "app.h"
 #include "chip8.h"
 #include "display.h"
 #include "keypad.h"
@@ -14,17 +14,23 @@
 #include "speaker.h"
 #include "types.h"
 
-#define WINDOW_SCALE 8
-#define WINDOW_W (DISPLAY_W * WINDOW_SCALE)
-#define WINDOW_H (DISPLAY_H * WINDOW_SCALE)
+/*
+    Main
 
-void update_keypad(keypad_t* keypad);
+    The emulator entry point and main updates loop.
+*/
 
 int main(int argc, char* argv[])
 {
     // parse args
     if (argc != 2) {
         fprintf(stderr, "ERROR: usage should be ./chip8 [rom.ch8]\n");
+        return EXIT_FAILURE;
+    }
+
+    // open window
+    app_t app;
+    if (!app_init(&app)) {
         return EXIT_FAILURE;
     }
     
@@ -47,22 +53,6 @@ int main(int argc, char* argv[])
     chip8_reset(&chip8);
     chip8_load_rom(&chip8, &rom);
 
-    // init SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "ERROR: could not initialize SDL: %s\n", SDL_GetError());
-        // goto sdl_init_fail;
-    }
-    SDL_Window* window = SDL_CreateWindow("Chip8",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        WINDOW_W, WINDOW_H,
-        SDL_WINDOW_SHOWN
-    );
-    if (!window) {
-        fprintf(stderr, "ERROR: could not create SDL window: %s\n", SDL_GetError());
-        // goto sdl_window_fail;
-    }
-    SDL_Surface* window_surface = SDL_GetWindowSurface(window);
-
     // tick emulator
     u32 cycles = 0;
     bool running = true;
@@ -78,18 +68,10 @@ int main(int argc, char* argv[])
         if (cycles >= CPU_FREQ_HZ / TIMER_FREQ_HZ) {
             cycles = 0;
 
-            // handle events
-            SDL_Event event;
-            while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT) {
-                    running = false;
-                    break;
-                }
+            if (!app_update(&app, &keypad)) {
+                running = false;
+                break;
             }
-
-            // update
-            update_keypad(&keypad);
-
             chip8_timers_tick(&chip8);
             speaker_tick(&speaker, chip8.ST);
             // printf("%c", chip8.ST > 0 ? '*' : '-');
@@ -102,51 +84,16 @@ int main(int argc, char* argv[])
                 speaker.state = SPEAKER_RESET;
             }
 
-            // render
-            SDL_LockSurface(window_surface);
-            for (u32 i = 0; i < WINDOW_W * WINDOW_H; i++) {
-                u32 x = (i % WINDOW_W) / WINDOW_SCALE;
-                u32 y = (i / WINDOW_W) / WINDOW_SCALE;
-                u8 px = display.vram[x + y * DISPLAY_W] ? 255 : 0;
-                u8* pixels = window_surface->pixels;
-                pixels[i*4 + 0] = px;
-                pixels[i*4 + 1] = px;
-                pixels[i*4 + 2] = px;
-                pixels[i*4 + 3] = px;
-            }
-            SDL_UnlockSurface(window_surface);
-            SDL_UpdateWindowSurface(window);
+            app_render(&app, &display);
         }
 
-        SDL_Delay((u32)(1.0f/CPU_FREQ_HZ*1000));
+        app_sleep(&app, (u32)(1.0f/CPU_FREQ_HZ*1000));
         cycles++;
     }
 
     // cleanup
     rom_free(&rom);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    app_close(&app);
 
-    return 0;
-}
-
-void update_keypad(keypad_t* keypad)
-{
-    const u8* keys = SDL_GetKeyboardState(NULL);
-    keypad->keys[0] = keys[SDL_SCANCODE_X];
-    keypad->keys[1] = keys[SDL_SCANCODE_1];
-    keypad->keys[2] = keys[SDL_SCANCODE_2];
-    keypad->keys[3] = keys[SDL_SCANCODE_3];
-    keypad->keys[4] = keys[SDL_SCANCODE_Q];
-    keypad->keys[5] = keys[SDL_SCANCODE_W];
-    keypad->keys[6] = keys[SDL_SCANCODE_E];
-    keypad->keys[7] = keys[SDL_SCANCODE_A];
-    keypad->keys[8] = keys[SDL_SCANCODE_S];
-    keypad->keys[9] = keys[SDL_SCANCODE_D];
-    keypad->keys[10] = keys[SDL_SCANCODE_Z];
-    keypad->keys[11] = keys[SDL_SCANCODE_C];
-    keypad->keys[12] = keys[SDL_SCANCODE_4];
-    keypad->keys[13] = keys[SDL_SCANCODE_R];
-    keypad->keys[14] = keys[SDL_SCANCODE_F];
-    keypad->keys[15] = keys[SDL_SCANCODE_V];
+    return EXIT_SUCCESS;
 }

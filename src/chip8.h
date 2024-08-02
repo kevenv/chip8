@@ -18,6 +18,12 @@ typedef struct display_t display_t;
 typedef struct keypad_t keypad_t;
 typedef struct rom_t rom_t;
 
+/*
+    Chip8
+
+    The Chip8 SoC, including the CPU, timers, stack and RAM.
+*/
+
 typedef struct chip8_t chip8_t;
 struct chip8_t {
     // CPU
@@ -31,8 +37,8 @@ struct chip8_t {
     u8 ram[RAM_SIZE];
 
     // timers
-    u8 DT; // delay timer
-    u8 ST; // sound timer
+    u8 DT; // delay timer, 60Hz
+    u8 ST; // sound timer, 60Hz
 
     // devices
     display_t* display;

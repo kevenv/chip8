@@ -9,16 +9,20 @@
 #include "types.h"
 
 /*
-Layout:
-    1 2 3 C
-    4 5 6 D
-    7 8 9 E
-    A 0 B F
+    Keypad
 
-Arrow keys: 
-      2
-    4   6
-      8
+    A keypad of 16 keys indexed from 0 to F.
+
+    Layout:
+        1 2 3 C
+        4 5 6 D
+        7 8 9 E
+        A 0 B F
+
+    Arrow keys: 
+          2
+        4   6
+          8
 */
 
 #define N_KEYS 16

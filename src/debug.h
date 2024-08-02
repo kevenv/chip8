@@ -12,6 +12,12 @@
 #include "keypad.h"
 #include "types.h"
 
+/*
+    Debug
+
+    Useful debugging tools, completely decoupled from the emulator.
+*/
+
 static void dump_instruction(u16 instruction)
 {
     // TODO: decode_instruction() ?
