@@ -9,4 +9,4 @@ See my blog post for explanations on how Chip8 works and how I have implemented 
 `make`
 
 ## Run
-`./_build/chip8 roms/pong.ch8`
+`./_build/chip8 [roms/pong.ch8]`
